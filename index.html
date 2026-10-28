@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checkbox attention: animation variants</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceff5;--panel:#fff;--ink:#141821;--mute:#5b6372;--line:#d6dbe6;--blue:#3f6bff;--blue-soft:#e8edff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131a;--panel:#1a1f2a;--ink:#eef0f5;--mute:#9aa3b5;--line:#2c3342;--blue-soft:#222b4d}}
+:root[data-theme="dark"]{--bg:#10131a;--panel:#1a1f2a;--ink:#eef0f5;--mute:#9aa3b5;--line:#2c3342;--blue-soft:#222b4d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-wrap:wrap;gap:32px;justify-content:center;align-items:flex-start}
+h1{font-size:20px;margin:0 0 4px;font-weight:700}
+.side{flex:1 1 320px;max-width:440px}
+.side p{margin:0 0 16px;color:var(--mute)}
+.opts{display:grid;gap:8px}
+.opt{all:unset;cursor:pointer;display:block;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--panel)}
+.opt:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.opt b{display:block;font-weight:600}
+.opt span{color:var(--mute);font-size:13px}
+.opt[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft)}
+.reset{margin-top:12px;font:600 14px Inter,sans-serif;padding:10px 16px;border-radius:10px;border:1.5px solid var(--blue);background:transparent;color:var(--blue);cursor:pointer}
+.stage{flex:0 0 auto;max-width:100%}
+/* phone screen: product UI, always light */
+.phone{width:375px;max-width:100%;height:740px;background:#f7f8fa;border-radius:28px;border:1px solid #d6dbe6;overflow:hidden;display:flex;flex-direction:column;color:#141821;position:relative}
+.head{background:#fff;border-radius:0 0 28px 28px;padding:28px 28px 22px;box-shadow:0 4px 18px rgba(20,24,33,.06)}
+.head .row{display:flex;justify-content:space-between;align-items:center}
+.head h2{margin:0;font-size:19px;font-weight:700}
+.bars{display:flex;gap:6px;margin-top:20px}
+.bars i{flex:1;height:4px;border-radius:2px;background:#3f6bff}
+.body{flex:1;padding:24px 16px}
+.panel{background:#fff;border:1px solid #e6e9f0;border-radius:18px;padding:22px 20px}
+.panel h3{margin:0 0 12px;font-size:22px;font-weight:400}
+.panel p{margin:0 0 18px;font-size:15px}
+.doc{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #e6e9f0;border-radius:14px;color:#3f6bff;font-weight:600;font-size:15px}
+.doc:focus-visible{outline:3px solid #3f6bff;outline-offset:2px}
+.doc .ico{width:42px;height:42px;border-radius:10px;background:#e5e8ef;display:grid;place-items:center;color:#141821}
+.doc .t{flex:1}
+.foot{background:#fff;border-top:1px solid #e6e9f0;padding:18px 20px 22px}
+.check{display:flex;gap:14px;align-items:flex-start;position:relative;padding:8px 6px;border-radius:12px}
+.box{all:unset;flex:none;width:34px;height:34px;border-radius:8px;border:2px solid #b6bcc8;background:#e5e8ef;display:grid;place-items:center;position:relative;cursor:not-allowed}
+.box svg{opacity:0;transform:scale(.6);transition:.15s}
+.check.on .box{background:#fff;border-color:#3f6bff;cursor:pointer}
+.check.on .box:focus-visible{outline:3px solid #3f6bff;outline-offset:3px}
+.check.done .box{background:#3f6bff}
+.check.done .box svg{opacity:1;transform:none}
+.check label{font-size:15px;line-height:1.4;padding-top:5px;color:#141821}
+.check label u{text-decoration:none;color:#3f6bff}
+.btns{display:flex;gap:14px;margin-top:16px}
+.btns button{flex:1;height:48px;border-radius:10px;font:700 15px Inter,sans-serif;cursor:pointer}
+.back{background:#fff;border:2px solid #3f6bff;color:#141821}
+.submit{background:#3f6bff;border:2px solid #3f6bff;color:#fff;cursor:pointer}
+.msg{margin:4px 6px 0 54px;color:#c62d3b;font-size:13px;font-weight:600}
+.msg[hidden]{display:none}
+.check.err:not(.done) .box{border-color:#c62d3b}
+.doc.nudge{animation:wiggle .7s ease-in-out 1}
+.tip{position:absolute;left:0;bottom:calc(100% + 6px);background:#141821;color:#fff;font-size:13px;font-weight:600;padding:8px 12px;border-radius:10px;opacity:0;pointer-events:none;white-space:nowrap}
+.tip::after{content:"";position:absolute;left:14px;top:100%;border:6px solid transparent;border-top-color:#141821}
+/* variants */
+@keyframes bounce{0%,100%{transform:translateY(0)}20%{transform:translateY(-14px)}40%{transform:translateY(0)}60%{transform:translateY(-8px)}80%{transform:translateY(0)}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(63,107,255,.55)}100%{box-shadow:0 0 0 16px rgba(63,107,255,0)}}
+@keyframes wiggle{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px) rotate(-1deg)}35%{transform:translateX(6px) rotate(1deg)}55%{transform:translateX(-4px)}75%{transform:translateX(3px)}}
+@keyframes sweep{0%{background:rgba(63,107,255,0)}25%,60%{background:rgba(63,107,255,.16)}100%{background:rgba(63,107,255,0)}}
+@keyframes pop{0%{transform:scale(1)}30%{transform:scale(1.4)}55%{transform:scale(.92)}75%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(63,107,255,0)}40%{box-shadow:0 0 0 6px rgba(63,107,255,.3)}}
+@keyframes tip{0%{opacity:0;transform:translateY(6px)}15%,85%{opacity:1;transform:none}100%{opacity:0}}
+.v-bounce .box{animation:bounce .9s ease-out 2}
+.v-ring .box{animation:ring 1s ease-out 3}
+.v-wiggle{animation:wiggle .7s ease-in-out 1}
+.v-sweep{animation:sweep 1.6s ease-in-out 1}
+.v-pop .box{animation:pop .8s cubic-bezier(.3,1.6,.5,1) 1,glow 1.2s ease-in-out 2}
+.v-hint .tip{animation:tip 3.2s ease-out 1}
+.v-hint .box{animation:ring 1s ease-out 3}
+@media (prefers-reduced-motion:reduce){.check *,.check,.doc{animation:none!important}.v-hint .tip{opacity:1}}
+@media (max-width:420px){.phone{height:700px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="side">
+    <h1>Checkbox attention variants</h1>
+    <p>Tap the agreement card to unlock the checkbox and play the selected animation. Submit is always tappable: try it with the box empty, before and after opening the agreement.</p>
+    <div class="opts" id="opts"></div>
+    <button class="reset" id="reset" type="button">Reset screen</button>
+  </div>
+  <div class="stage">
+    <div class="phone">
+      <div class="head">
+        <div class="row"><h2>Review Agreement</h2>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141821" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></div>
+        <div class="bars"><i></i><i></i><i></i></div>
+      </div>
+      <div class="body">
+        <div class="panel">
+          <h3>HSA Custodial Agreement</h3>
+          <p>Open all agreements prior to agreeing to reviewing each item.</p>
+          <button class="doc" id="doc" type="button">
+            <span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 9h10M7 13h10M7 17h6"/></svg></span>
+            <span class="t">HSA Custodial Agreement</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141821" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="foot">
+        <div class="check" id="check">
+          <span class="tip">Tick to confirm you&rsquo;ve read it</span>
+          <button class="box" id="box" type="button" role="checkbox" aria-checked="false" aria-disabled="true" aria-labelledby="lbl">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </button>
+          <label id="lbl">I have reviewed the <u>HSA Custodial Agreement</u></label>
+        </div>
+        <div class="msg" id="msg" role="alert" hidden></div>
+        <div class="btns"><button class="back" type="button">Back</button><button class="submit" id="submit" type="button">Submit</button></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const variants=[
+ ['bounce','A. Bounce (current)','Checkbox hops up and down twice.'],
+ ['ring','B. Pulse ring','Soft blue halo ripples out three times. Calm, no movement.'],
+ ['wiggle','C. Nudge','The whole row shakes sideways once, like a &ldquo;look here&rdquo;.'],
+ ['sweep','D. Row highlight','The row flashes a blue tint, so the full tap area reads as active.'],
+ ['pop','E. Pop and glow','Checkbox springs larger, settles, then glows.'],
+ ['hint','F. Hint tooltip','Short helper text appears above the checkbox with a pulse. Most explicit.']
+];
+const $=id=>document.getElementById(id),check=$('check'),box=$('box'),sub=$('submit'),msg=$('msg'),opts=$('opts');
+let cur='bounce',unlocked=false;
+function render(){opts.innerHTML='';variants.forEach(([k,t,d])=>{const b=document.createElement('button');b.className='opt';b.type='button';b.setAttribute('aria-pressed',k===cur);b.innerHTML='<b>'+t+'</b><span>'+d+'</span>';b.onclick=()=>{cur=k;render();reset();};opts.appendChild(b);});}
+function reset(){unlocked=false;check.className='check';box.setAttribute('aria-checked','false');box.setAttribute('aria-disabled','true');msg.hidden=true;sub.textContent='Submit';}
+function fail(){if(unlocked){msg.textContent='Tick the box to confirm you\u2019ve reviewed the agreement.';play();}else{msg.textContent='Open the agreement first, then tick the box.';const d=$('doc');d.classList.remove('nudge');void d.offsetWidth;d.classList.add('nudge');}msg.hidden=false;check.classList.add('err');}
+function play(){check.classList.remove('v-bounce','v-ring','v-wiggle','v-sweep','v-pop','v-hint');void check.offsetWidth;check.classList.add('v-'+cur);}
+$('doc').onclick=()=>{if(unlocked){play();return;}unlocked=true;msg.hidden=true;check.classList.remove('err');check.classList.add('on');box.setAttribute('aria-disabled','false');play();};
+sub.onclick=()=>{if(check.classList.contains('done')){msg.hidden=true;sub.textContent='Submitted \u2713';}else fail();};
+box.onclick=()=>{if(!unlocked){fail();return;}const on=check.classList.toggle('done');box.setAttribute('aria-checked',on);if(on){msg.hidden=true;check.classList.remove('err');sub.textContent='Submit';}check.classList.remove('v-bounce','v-ring','v-wiggle','v-sweep','v-pop','v-hint');};
+$('reset').onclick=reset;
+render();
+</script>
+</body>
+</html>
